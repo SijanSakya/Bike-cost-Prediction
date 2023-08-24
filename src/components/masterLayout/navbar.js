@@ -6,7 +6,10 @@ const Navbar = () => {
     <div className='bg-custom-nav/50 fixed top-0 z-10 w-full bg-opacity-80 '>
         <div className='flex justify-between px-7 py-3'>
             <div>
-               <p>Cost Prediction</p>
+              <Link href='/'>
+              <p>Cost Prediction</p>
+              </Link>
+             
             </div>
             <div>
               <Link href='/login'>

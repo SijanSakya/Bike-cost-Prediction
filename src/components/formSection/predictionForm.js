@@ -1,9 +1,12 @@
 "use client";
 import { useState } from "react";
-import axios from 'axios';
-
+import axios from "axios";
+import Link from "next/link";
+import supabase from '../../config/supabaseClient'
 
 const PredctionForm = ({ data }) => {
+
+  const [formError, setFormError] = useState(null);
   const [selectedBike, setSelectedBike] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
@@ -21,8 +24,15 @@ const PredctionForm = ({ data }) => {
   const uniqueAge = [...new Set(data.map((data) => data.age))];
   const uniqueOwner = [...new Set(data.map((data) => data.owner))];
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async(event) => {
     event.preventDefault();
+
+    if (!selectedBike|| !selectedBrand || !selectedCity || !selectedKmsDriven || !selectedAge  || !selectedPower || !selectedOwner) {
+      setFormError('Please fill in all the fields correctly.')
+      alert('Please fill in all the fields correctly.')
+      return
+    }
+  
     const formData = {
       bikeName: selectedBike,
       brand: selectedBrand,
@@ -33,29 +43,36 @@ const PredctionForm = ({ data }) => {
       age: selectedAge,
     };
 
-    console.log(formData);
+    // console.log(formData);
 
-    axios.post('http://localhost:5000/bike-data', formData)
-      .then(response => {
-        
-        console.log(response.data);
-        alert("successfull")
-      })
-      .catch(error => {
-       
-        console.error(error);
-        alert("Data not send something error")
-      });
-    
+   
+
+    axios
+    .post("http://localhost:5000/bike-data", formData)
+    .then((response) => {
+      console.log(response.data);  // Should log: { message: 'Data received successfully' }
+      alert("Successfully sent data to the server.");
+    })
+    .catch((error) => {
+      console.error(error);
+      alert("Data not sent. Encountered an error.");
+    });
+  
   };
-
-
 
   return (
     <div>
       <div className="py-5">
         <div className="flex flex-col gap-3">
-          <h1 className="text-2xl font-bold"> Check Price of Used Bikes</h1>
+          <div className="flex justify-between">
+            <h1 className="text-2xl font-bold"> Check Price of Used Bikes</h1>
+            <div className="bg-yellow-700 px-4 py-1 rounded-sm text-white  ">
+              <Link href="/recentSearch">
+                <button>Recent Search</button>
+              </Link>
+            </div>
+          </div>
+
           <p className="text-sm ">
             This web application helps to suggests used bike valuation through
             its basic and valuation reports. While buying a used bike, it is
@@ -90,7 +107,9 @@ const PredctionForm = ({ data }) => {
             </div>
 
             <div>
-              <label htmlFor="brand" className=" inline-block w-24">Brand:</label>
+              <label htmlFor="brand" className=" inline-block w-24">
+                Brand:
+              </label>
               <select
                 className="w-40 px-2 ml-3 border-2"
                 id="brand"
@@ -109,7 +128,9 @@ const PredctionForm = ({ data }) => {
             </div>
 
             <div>
-              <label htmlFor="city" className=" inline-block w-24">City:</label>
+              <label htmlFor="city" className=" inline-block w-24">
+                City:
+              </label>
               <select
                 className="w-40 px-2 ml-3 border-2"
                 name="city"
@@ -128,7 +149,9 @@ const PredctionForm = ({ data }) => {
             </div>
 
             <div>
-              <label htmlFor="city" className=" inline-block w-24">Power:</label>
+              <label htmlFor="city" className=" inline-block w-24">
+                Power:
+              </label>
               <select
                 className="w-40 px-2 ml-3 border-2"
                 name="power"
@@ -147,7 +170,9 @@ const PredctionForm = ({ data }) => {
             </div>
 
             <div>
-              <label htmlFor="city" className=" inline-block w-24">Owner:</label>
+              <label htmlFor="city" className=" inline-block w-24">
+                Owner:
+              </label>
               <select
                 className="w-40 px-2 ml-3 border-2"
                 name="owner"
@@ -166,7 +191,9 @@ const PredctionForm = ({ data }) => {
             </div>
 
             <div>
-              <label htmlFor="city" className=" inline-block w-24">Kms Driven</label>
+              <label htmlFor="city" className=" inline-block w-24">
+                Kms Driven
+              </label>
               <input
                 className="w-40 px-2 ml-3 border-2 placeholder-black placeholder-opacity-50"
                 name="kms_driven"
@@ -177,7 +204,9 @@ const PredctionForm = ({ data }) => {
             </div>
 
             <div>
-              <label htmlFor="city" className=" inline-block w-24">Age</label>
+              <label htmlFor="city" className=" inline-block w-24">
+                Age
+              </label>
               <input
                 className="w-40 px-2 ml-3 border-2 placeholder-black placeholder-opacity-50"
                 name="age"

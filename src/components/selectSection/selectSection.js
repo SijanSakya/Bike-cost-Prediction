@@ -26,7 +26,7 @@ const SelectSection = ({data}) => {
       <div className='flex flex-wrap gap-10 px-7 justify-center'>
         { uniqueBrands.slice(0, numToShow).map((brand)  => (
          <div className='flex flex-col justify-center items-center gap-3'>
-             <div className='h-48 w-48  border-2 hover:cursor-pointer hover:scale-110 text-center '>
+             <div className='h-48 w-48  border-2 hover:cursor-pointer hover:scale-110  flex items-center justify-center'>
                 Logo 
              </div>
              <div>
