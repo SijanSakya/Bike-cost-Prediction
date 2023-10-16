@@ -7,6 +7,11 @@ import supabase from '../../config/supabaseClient'
 const PredctionForm = ({ data }) => {
 
   const [formError, setFormError] = useState(null);
+  const [apiData, setApiData] = useState(null);
+
+  const [bike, setBike] =useState('');
+
+
   const [selectedBike, setSelectedBike] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
@@ -18,21 +23,28 @@ const PredctionForm = ({ data }) => {
   const uniqueBrands = [...new Set(data.map((data) => data.brand))];
 
   const uniqueBike = [...new Set(data.map((data) => data.bike_name))];
-  const uniqueCity = [...new Set(data.map((data) => data.city))];
+  const uniqueCity1 = [...new Set(data.map((data) => data.city))];
   const uniquekms = [...new Set(data.map((data) => data.kms_driven))];
   const uniquePower = [...new Set(data.map((data) => data.power))];
   const uniqueAge = [...new Set(data.map((data) => data.age))];
   const uniqueOwner = [...new Set(data.map((data) => data.owner))];
 
+  const uniqueCity = uniqueCity1.sort();
+  // const cityCounts = data.reduce((acc, cur) => {
+  //   acc[cur.city] = (acc[cur.city] || 0) + 1;
+  //   return acc;
+  // }, {});
+  // const sortedCities = Object.entries(cityCounts).sort((a, b) => b[1] - a[1]);
+ 
   const handleSubmit = async(event) => {
     event.preventDefault();
 
+    //validation
     if (!selectedBike|| !selectedBrand || !selectedCity || !selectedKmsDriven || !selectedAge  || !selectedPower || !selectedOwner) {
       setFormError('Please fill in all the fields correctly.')
       alert('Please fill in all the fields correctly.')
       return
     }
-  
     const formData = {
       bikeName: selectedBike,
       brand: selectedBrand,
@@ -42,23 +54,51 @@ const PredctionForm = ({ data }) => {
       kmsDriven: selectedKmsDriven,
       age: selectedAge,
     };
-
-    // console.log(formData);
-
-   
-
     axios
     .post("http://localhost:5000/bike-data", formData)
     .then((response) => {
       console.log(response.data);  // Should log: { message: 'Data received successfully' }
+      setApiData(response.data);
+      const price = response.data;
+      console.log(price,"price is")
       alert("Successfully sent data to the server.");
     })
     .catch((error) => {
       console.error(error);
       alert("Data not sent. Encountered an error.");
     });
+
   
+  const result = JSON.stringify(apiData, null, 2)
+
+  //insert in database
+    const { data, error } = await supabase
+      .from('Bikedata')
+      .insert([{ bikename: selectedBike, brand: selectedBrand, kmsdriven : selectedKmsDriven,owner: selectedOwner,city: selectedCity, power: selectedPower ,  age: selectedAge}])
+
+    if (error) {
+      console.log(error)
+      setFormError('Please fill in all the fields correctly.')
+      alert("cant insert to database")
+    }
+    if (data) {
+      console.log("database insert" ,data)
+    
+      setFormError(null)
+    }
+    // selectedBike('')  
+    // selectedBrand('')
+    // selectedCity('')
+    // selectedKmsDriven('')
+    // selectedAge('')
+    // selectedPower('')
+    // selectedOwner('')
   };
+
+  const getBrandForSelectedBike = (selectedBikeName) => {
+    const bikeData = data.find(bike => bike.bike_name === selectedBikeName);
+    return bikeData ? bikeData.brand : null;
+  }
 
   return (
     <div>
@@ -72,7 +112,7 @@ const PredctionForm = ({ data }) => {
               </Link>
             </div>
           </div>
-
+           
           <p className="text-sm ">
             This web application helps to suggests used bike valuation through
             its basic and valuation reports. While buying a used bike, it is
@@ -83,6 +123,9 @@ const PredctionForm = ({ data }) => {
           </p>
         </div>
       </div>
+      <div>
+       
+      </div>
       <div className="py-6 px-7">
         <form onSubmit={handleSubmit}>
           <div className="flex flex-wrap flex-col gap-5">
@@ -92,7 +135,7 @@ const PredctionForm = ({ data }) => {
               </label>
               <select
                 className="w-40 px-2 ml-3 border-2"
-                name="bike name"
+                name="bike_name"
                 value={selectedBike}
                 onChange={(e) => setSelectedBike(e.target.value)}
               >
@@ -105,7 +148,8 @@ const PredctionForm = ({ data }) => {
                 ))}
               </select>
             </div>
-
+           
+           
             <div>
               <label htmlFor="brand" className=" inline-block w-24">
                 Brand:
@@ -119,7 +163,7 @@ const PredctionForm = ({ data }) => {
               >
                 <option value=""></option>
                 {/* Map over the unique brands and create options */}
-                {uniqueBrands.map((brand) => (
+                {uniqueBrands.sort((a, b) => a - b).map((brand) => (
                   <option key={brand} value={brand}>
                     {brand}
                   </option>
@@ -144,10 +188,11 @@ const PredctionForm = ({ data }) => {
                   <option key={city} value={city}>
                     {city}
                   </option>
+                
                 ))}
               </select>
             </div>
-
+       
             <div>
               <label htmlFor="city" className=" inline-block w-24">
                 Power:
@@ -161,7 +206,7 @@ const PredctionForm = ({ data }) => {
               >
                 <option value=""></option>
                 {/* Map over the bike names from jsondata and create options */}
-                {uniquePower.map((power) => (
+                {uniquePower.sort((a, b) => a - b).map((power) => (
                   <option key={power} value={power}>
                     {power}
                   </option>
@@ -181,7 +226,6 @@ const PredctionForm = ({ data }) => {
                 placeholder="owner"
               >
                 <option value=""></option>
-                {/* Map over the bike names from jsondata and create options */}
                 {uniqueOwner.map((owner) => (
                   <option key={owner} value={owner}>
                     {owner}
@@ -197,6 +241,9 @@ const PredctionForm = ({ data }) => {
               <input
                 className="w-40 px-2 ml-3 border-2 placeholder-black placeholder-opacity-50"
                 name="kms_driven"
+                type="number"
+                min='25'
+                max='100000'
                 value={selectedKmsDriven}
                 onChange={(e) => setSelectedKmsDriven(e.target.value)}
                 placeholder="kms driven"
@@ -210,17 +257,27 @@ const PredctionForm = ({ data }) => {
               <input
                 className="w-40 px-2 ml-3 border-2 placeholder-black placeholder-opacity-50"
                 name="age"
+                type="number"
+                min='1'
+                max='10'
                 value={selectedAge}
                 onChange={(e) => setSelectedAge(e.target.value)}
                 placeholder="Age"
               />
-            </div>
+                                      ; </div>
 
             <div className="bg-yellow-700 px-4 py-1 rounded-sm text-white w-20 ">
               <button type="submit">Predict</button>
             </div>
           </div>
         </form>
+        {apiData && (
+                <div className=" px-2 py-4 text-gray-700 flex flex-col gap-2 ">
+                    <h3>Predicted Price of the Bike in Nepali Market</h3>
+                    {/* <h3>In Nepali Currency : Rs {JSON.stringify(apiData*3, null, 2)}</h3> */}
+                    <h3> Rs: {((apiData.toFixed(2))*3).toFixed(2)}</h3>
+                </div>
+            )}
       </div>
     </div>
   );

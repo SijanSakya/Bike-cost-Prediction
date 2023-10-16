@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { Formik, Form, Field } from "formik";
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
-import { useRouter } from "next/router";
+import { useRouter } from 'next/navigation'
 // import logo from 'assets/img/logo.png'
 import { BsPhone } from 'react-icons/bs'
 import { RiLockPasswordLine } from 'react-icons/ri'
@@ -26,7 +26,7 @@ const validationSchema = Yup.object({
 
 const onSubmit = (values) => {
 
-    // const router = useRouter();
+    const router = useRouter();
     console.log(values);
     const _static_creds = { uid:'sijan@gmail.com', pw: "1111", uname: "PVE" };
     if (
@@ -39,7 +39,7 @@ const onSubmit = (values) => {
                 _static_creds.uname
             );
         }
-        // router.push("/admin");
+         router.push("/");
     } else {
         alert("Wrong username or password!! ");
     }
@@ -77,7 +77,7 @@ const Login = () => {
                                     _static_creds.uname
                                 );
                             }
-                           // router.push("/admin");
+                            router.push("/");
                         } else {
                             alert("Wrong username or password!! ");
                         }
@@ -146,13 +146,17 @@ const Login = () => {
                                 <div className="flex items-center justify-center w-[400px] gap-3 ">
                                     {/* <Field type="checkbox" name="remember" id="remember" /> */}
                                     <div>
-                                        <button
+                                        {/* <button
                                             type="submit"
                                             disabled={!isValid || !dirty } 
-                                            className="py-2 px-20 disabled:cursor-not-allowed bg-blue-200 text-black text-sm  rounded-sm "
+                                            className="py-2 px-20 cursor-pointer bg-blue-200 text-black text-sm  rounded-sm "
                                         >
                                             Login Now
-                                        </button>
+                                        </button> */}
+                                         <Link href="/">
+                                            <button
+                                            className="py-2 px-20 cursor-pointer bg-blue-200 text-black text-sm  rounded-sm ">Login Now</button>
+                                        </Link>
                                     </div>
                                 </div>
                             </div>

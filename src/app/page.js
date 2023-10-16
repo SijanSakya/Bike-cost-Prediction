@@ -4,11 +4,12 @@ import HeroSection from "@/components/heroSection/heroSection";
 import MasterLayout from "@/components/masterLayout/masterLayout";
 import SelectSection from "@/components/selectSection/selectSection";
 import jsondata from "@/static/csvjson.json";
+import jsondata1 from "@/static/NepaliData.json";
 import Image from "next/image";
 
 export default function Home() {
  
-  const data = jsondata;
+  const data = jsondata1;
   // console.log(data)
   return (
     <div>

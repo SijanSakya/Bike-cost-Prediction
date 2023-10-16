@@ -27,8 +27,8 @@ const ResentData = () => {
 
   console.log("data",supaData);
   return (
-    <div>
-      <div className="flex justify-center font-sans font-bold text-gray-600 ">
+    <div className="h-full">
+      <div className="flex  justify-center font-sans font-bold text-gray-600 ">
         {fetchError && <p>{fetchError}</p>}
       </div>
       <div className="pt-10">
